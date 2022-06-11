@@ -1,0 +1,24 @@
+{
+  "name": "file-manager",
+  "version": "1.0.0",
+  "description": "Node.js file manager",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anhelina-zhurauliova/file-manager.git"
+  },
+  "keywords": [
+    "nodejs",
+    "file manager"
+  ],
+  "author": "anhelina-zhurauliova",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anhelina-zhurauliova/file-manager/issues"
+  },
+  "homepage": "https://github.com/anhelina-zhurauliova/file-manager#readme"
+}
