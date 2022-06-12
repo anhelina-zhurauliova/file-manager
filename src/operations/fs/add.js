@@ -7,17 +7,21 @@ import {
 } from "../../utils/logs.js";
 
 export const add = async (args, currentDirectory) => {
-  if (args.length !== 1) {
+  try {
+    if (args.length !== 1) {
+      throw new Error();
+    } else {
+      const [fileName] = args;
+      const filePath = join(currentDirectory, fileName);
+
+      if (fileName) {
+        createWriteStream(filePath);
+        logCurrentDirectory(currentDirectory);
+      } else {
+        throw new Error();
+      }
+    }
+  } catch (e) {
     handleFailedOperation();
-  } else {
-    const [fileName] = args;
-    const filePath = join(currentDirectory, fileName);
-    const writableStream = createWriteStream(filePath);
-
-    writableStream.on("error", () => {
-      handleFailedOperation();
-    });
-
-    logCurrentDirectory(currentDirectory);
   }
 };

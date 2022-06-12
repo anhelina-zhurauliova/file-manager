@@ -5,51 +5,55 @@ import {
 } from "../../utils/logs.js";
 
 export const os = (args, currentDirectory) => {
-  if (args.length !== 1) {
-    handleFailedOperation();
-  } else {
-    const [param] = args;
+  try {
+    if (args.length !== 1) {
+      throw new Error();
+    } else {
+      const [param] = args;
 
-    switch (param) {
-      case "--EOL":
-        console.log(JSON.stringify(EOL));
-        logCurrentDirectory(currentDirectory);
-        break;
+      switch (param) {
+        case "--EOL":
+          console.log(JSON.stringify(EOL));
+          logCurrentDirectory(currentDirectory);
+          break;
 
-      case "--cpus":
-        const cpusInfo = cpus().map(({ model, speed }) => ({
-          model: model,
-          speed: speed / 1000,
-        }));
+        case "--cpus":
+          const cpusInfo = cpus().map(({ model, speed }) => ({
+            model: model,
+            speed: speed / 1000,
+          }));
 
-        console.log("cpus amount:", cpusInfo.length);
-        console.log(cpusInfo);
-        logCurrentDirectory(currentDirectory);
+          console.log("cpus amount:", cpusInfo.length);
+          console.log(cpusInfo);
+          logCurrentDirectory(currentDirectory);
 
-        break;
+          break;
 
-      case "--homedir":
-        console.log(homedir());
-        logCurrentDirectory(currentDirectory);
+        case "--homedir":
+          console.log(homedir());
+          logCurrentDirectory(currentDirectory);
 
-        break;
+          break;
 
-      case "--username":
-        const info = userInfo();
+        case "--username":
+          const info = userInfo();
 
-        console.log(info.username);
-        logCurrentDirectory(currentDirectory);
+          console.log(info.username);
+          logCurrentDirectory(currentDirectory);
 
-        break;
+          break;
 
-      case "--architecture":
-        console.log(arch());
-        logCurrentDirectory(currentDirectory);
+        case "--architecture":
+          console.log(arch());
+          logCurrentDirectory(currentDirectory);
 
-        break;
+          break;
 
-      default:
-        handleFailedOperation();
+        default:
+          throw new Error();
+      }
     }
+  } catch (e) {
+    handleFailedOperation();
   }
 };

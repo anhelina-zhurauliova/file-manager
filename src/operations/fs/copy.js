@@ -1,48 +1,51 @@
-import { createReadStream, createWriteStream, existsSync } from "fs";
+import { createReadStream, createWriteStream } from "fs";
 import { basename, join } from "path";
 
-import { getAbsolutePath } from "../../utils/path.js";
+import { getAbsolutePath, getPathInfo } from "../../utils/path.js";
 import {
   handleFailedOperation,
   logCurrentDirectory,
 } from "../../utils/logs.js";
 import { remove } from "./remove.js";
 
-export const copy = (args, currentDirectory, shouldRemoveSource) => {
-  if (args.length !== 2) {
-    handleFailedOperation();
-  } else {
-    const [file, directory] = args;
-    const sourcePath = getAbsolutePath(file, currentDirectory);
-    const destinationDirectory = getAbsolutePath(directory, currentDirectory);
-    const destinationPath = join(destinationDirectory, basename(sourcePath));
-
-    if (existsSync(destinationPath)) {
-      handleFailedOperation();
+export const copy = async (args, currentDirectory, shouldRemoveSource) => {
+  try {
+    if (args.length !== 2) {
+      throw new Error();
     } else {
-      let isErrored = false;
+      const [file, directory] = args;
 
-      const readable = createReadStream(sourcePath, {
-        encoding: "utf8",
-      });
-      const writable = createWriteStream(destinationPath);
+      const sourcePath = getAbsolutePath(file, currentDirectory);
+      const destinationDirectory = getAbsolutePath(directory, currentDirectory);
+      const destinationPath = join(destinationDirectory, basename(sourcePath));
 
-      const handleStreamError = () => {
-        if (!isErrored) {
-          isErrored = true;
-          handleFailedOperation();
-        }
-      };
+      const sourceInfo = await getPathInfo(sourcePath);
+      const destinationInfo = await getPathInfo(destinationDirectory);
 
-      readable.on("error", handleStreamError);
-      writable.on("error", handleStreamError);
-      readable.on("end", () => {
+      const isReadingEnabled = sourceInfo.exists && sourceInfo.isFile;
+      const isWritingEnabled =
+        destinationInfo.exists && destinationInfo.isDirectory;
+
+      const readable =
+        isReadingEnabled &&
+        createReadStream(sourcePath, {
+          encoding: "utf8",
+        });
+
+      const writable =
+        isReadingEnabled &&
+        isWritingEnabled &&
+        createWriteStream(destinationPath);
+
+      const stream = readable.pipe(writable);
+
+      stream.on("finish", () => {
         shouldRemoveSource
-          ? remove(sourcePath, currentDirectory)
+          ? remove([sourcePath], currentDirectory)
           : logCurrentDirectory(currentDirectory);
       });
-
-      readable.pipe(writable);
     }
+  } catch (e) {
+    handleFailedOperation();
   }
 };

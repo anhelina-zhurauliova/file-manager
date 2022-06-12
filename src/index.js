@@ -12,6 +12,7 @@ import {
   hash,
   compress,
   decompress,
+  os,
 } from "./operations/index.js";
 import { getUserNameFromCliArg } from "./utils/user.js";
 import {
@@ -31,86 +32,84 @@ const rl = readline.createInterface({
 const fileManager = async () => {
   const args = process.argv.slice(2);
   const username = args.length && getUserNameFromCliArg(args[0]);
+
   let currentUserDirectory = homedir();
 
   if (username) {
     greetUser(username);
+
     logCurrentDirectory(currentUserDirectory);
 
     rl.on("line", async (input) => {
       const [operation, ...args] = input && parseInput(input);
 
-      try {
-        switch (operation) {
-          case "up":
-            if (args.length) {
-              handleFailedOperation();
-            } else {
-              currentUserDirectory = cd([".."], currentUserDirectory);
-            }
-            break;
+      switch (operation) {
+        case "up":
+          if (args.length) {
+            handleFailedOperation();
+          } else {
+            currentUserDirectory = await cd([".."], currentUserDirectory);
+          }
+          break;
 
-          case "cd":
-            currentUserDirectory = cd(args, currentUserDirectory);
-            break;
+        case "cd":
+          currentUserDirectory = await cd(args, currentUserDirectory);
+          break;
 
-          case "ls":
-            ls(args, currentUserDirectory);
-            break;
+        case "ls":
+          ls(args, currentUserDirectory);
+          break;
 
-          case "add":
-            add(args, currentUserDirectory);
-            break;
+        case "add":
+          add(args, currentUserDirectory);
+          break;
 
-          case "cat":
-            read(args, currentUserDirectory);
-            break;
+        case "cat":
+          read(args, currentUserDirectory);
+          break;
 
-          case "rm":
-            remove(args, currentUserDirectory);
-            break;
+        case "rm":
+          remove(args, currentUserDirectory);
+          break;
 
-          case "rn":
-            rename(args, currentUserDirectory);
-            break;
+        case "rn":
+          rename(args, currentUserDirectory);
+          break;
 
-          case "cp":
-            copy(args, currentUserDirectory, false);
-            break;
+        case "cp":
+          copy(args, currentUserDirectory, false);
+          break;
 
-          case "mv":
-            copy(args, currentUserDirectory, true);
-            break;
+        case "mv":
+          copy(args, currentUserDirectory, true);
+          break;
 
-          case "hash":
-            hash(args, currentUserDirectory);
-            break;
+        case "hash":
+          hash(args, currentUserDirectory);
+          break;
 
-          case "compress":
-            compress(args, currentUserDirectory);
-            break;
+        case "compress":
+          compress(args, currentUserDirectory);
+          break;
 
-          case "decompress":
-            decompress(args, currentUserDirectory);
-            break;
+        case "decompress":
+          decompress(args, currentUserDirectory);
+          break;
 
-          case "os":
-            os(args, currentUserDirectory);
-            break;
+        case "os":
+          os(args, currentUserDirectory);
+          break;
 
-          case ".exit":
-            if (args.length) {
-              handleFailedOperation();
-            } else {
-              rl.close();
-            }
-            break;
+        case ".exit":
+          if (args.length) {
+            handleFailedOperation();
+          } else {
+            rl.close();
+          }
+          break;
 
-          default:
-            handleInvalidInput();
-        }
-      } catch (e) {
-        handleFailedOperation();
+        default:
+          handleInvalidInput();
       }
     });
 
