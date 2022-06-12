@@ -4,8 +4,14 @@
 
 `npm run start -- --username=your_username`
 
-Note: username should be passed, otherwise program won't start
-You will see `Invalid input` if unknown command was entered and `Operation failed` if command cannot be executed due to invalid params
+Note:
+
+- Username should be passed, otherwise program won't start
+- You will see `Invalid input` if unknown command was entered and `Operation failed` if command cannot be executed due to invalid params
+- You can work with paths like these: `my file.txt`, `/Users/User/my folder`, if you will wrap them in double quotes
+  ```
+  cat "my file.txt", compress "my file.txt" "./my folder"
+  ```
 
 ## Operations
 
