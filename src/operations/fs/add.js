@@ -6,13 +6,18 @@ import {
   logCurrentDirectory,
 } from "../../utils/logs.js";
 
-export const add = async (fileName, currentDirectory) => {
-  const filePath = join(currentDirectory, fileName);
-  const writableStream = createWriteStream(filePath);
-
-  writableStream.on("error", () => {
+export const add = async (args, currentDirectory) => {
+  if (args.length !== 1) {
     handleFailedOperation();
-  });
+  } else {
+    const [fileName] = args;
+    const filePath = join(currentDirectory, fileName);
+    const writableStream = createWriteStream(filePath);
 
-  logCurrentDirectory(currentDirectory);
+    writableStream.on("error", () => {
+      handleFailedOperation();
+    });
+
+    logCurrentDirectory(currentDirectory);
+  }
 };

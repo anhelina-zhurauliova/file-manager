@@ -6,21 +6,26 @@ import {
 } from "../../utils/logs.js";
 import { getAbsolutePath } from "../../utils//path.js";
 
-export const read = async (pathToFile, currentDirectory) => {
-  const absolutePath = getAbsolutePath(pathToFile, currentDirectory);
-  const readableStream = createReadStream(absolutePath, { encoding: "utf8" });
-  let data = "";
-
-  readableStream.on("error", () => {
+export const read = async (args, currentDirectory) => {
+  if (args.length !== 1) {
     handleFailedOperation();
-  });
+  } else {
+    const [pathToFile] = args;
+    const absolutePath = getAbsolutePath(pathToFile, currentDirectory);
+    const readableStream = createReadStream(absolutePath, { encoding: "utf8" });
+    let data = "";
 
-  readableStream.on("data", (chunk) => {
-    data += chunk;
-  });
+    readableStream.on("error", () => {
+      handleFailedOperation();
+    });
 
-  readableStream.on("end", () => {
-    process.stdout.write(data + "\n");
-    logCurrentDirectory(currentDirectory);
-  });
+    readableStream.on("data", (chunk) => {
+      data += chunk;
+    });
+
+    readableStream.on("end", () => {
+      process.stdout.write(data + "\n");
+      logCurrentDirectory(currentDirectory);
+    });
+  }
 };

@@ -8,36 +8,41 @@ import {
 } from "../../utils/logs.js";
 import { remove } from "./remove.js";
 
-export const copy = (file, directory, currentDirectory, shouldRemoveSource) => {
-  const sourcePath = getAbsolutePath(file, currentDirectory);
-  const destinationDirectory = getAbsolutePath(directory, currentDirectory);
-  const destinationPath = join(destinationDirectory, basename(sourcePath));
-
-  if (existsSync(destinationPath)) {
+export const copy = (args, currentDirectory, shouldRemoveSource) => {
+  if (args.length !== 2) {
     handleFailedOperation();
   } else {
-    let isErrored = false;
+    const [file, directory] = args;
+    const sourcePath = getAbsolutePath(file, currentDirectory);
+    const destinationDirectory = getAbsolutePath(directory, currentDirectory);
+    const destinationPath = join(destinationDirectory, basename(sourcePath));
 
-    const readable = createReadStream(sourcePath, {
-      encoding: "utf8",
-    });
-    const writable = createWriteStream(destinationPath);
+    if (existsSync(destinationPath)) {
+      handleFailedOperation();
+    } else {
+      let isErrored = false;
 
-    const handleStreamError = () => {
-      if (!isErrored) {
-        isErrored = true;
-        handleFailedOperation();
-      }
-    };
+      const readable = createReadStream(sourcePath, {
+        encoding: "utf8",
+      });
+      const writable = createWriteStream(destinationPath);
 
-    readable.on("error", handleStreamError);
-    writable.on("error", handleStreamError);
-    readable.on("end", () => {
-      shouldRemoveSource
-        ? remove(sourcePath, currentDirectory)
-        : logCurrentDirectory(currentDirectory);
-    });
+      const handleStreamError = () => {
+        if (!isErrored) {
+          isErrored = true;
+          handleFailedOperation();
+        }
+      };
 
-    readable.pipe(writable);
+      readable.on("error", handleStreamError);
+      writable.on("error", handleStreamError);
+      readable.on("end", () => {
+        shouldRemoveSource
+          ? remove(sourcePath, currentDirectory)
+          : logCurrentDirectory(currentDirectory);
+      });
+
+      readable.pipe(writable);
+    }
   }
 };

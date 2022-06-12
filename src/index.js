@@ -1,5 +1,5 @@
 import readline from "readline";
-import os from "os";
+import { homedir } from "os";
 
 import {
   ls,
@@ -31,146 +31,95 @@ const rl = readline.createInterface({
 const fileManager = async () => {
   const args = process.argv.slice(2);
   const username = args.length && getUserNameFromCliArg(args[0]);
-  let currentUserDirectory = os.homedir();
+  let currentUserDirectory = homedir();
 
   if (username) {
     greetUser(username);
     logCurrentDirectory(currentUserDirectory);
-  }
 
-  rl.on("line", async (input) => {
-    const [operation, ...args] = input && parseInput(input);
+    rl.on("line", async (input) => {
+      const [operation, ...args] = input && parseInput(input);
 
-    try {
-      switch (operation) {
-        case "up":
-          if (args.length) {
-            handleFailedOperation();
-          } else {
-            currentUserDirectory = cd("..", currentUserDirectory);
-          }
-
-          break;
-
-        case "cd":
-          if (args.length !== 1) {
-            handleFailedOperation();
-          } else {
-            currentUserDirectory = cd(args[0], currentUserDirectory);
-          }
-
-          break;
-
-        case "ls":
-          if (args.length) {
-            handleFailedOperation();
-          } else {
-            ls(currentUserDirectory);
-          }
-
-          break;
-
-        case "add":
-          if (args.length !== 1) {
-            handleFailedOperation();
-          } else {
-            add(args[0], currentUserDirectory);
-          }
-
-          break;
-
-        case "cat":
-          if (args.length !== 1) {
-            handleFailedOperation();
-          } else {
-            read(args[0], currentUserDirectory);
-          }
-
-          break;
-
-        case "rm":
-          if (args.length !== 1) {
-            handleFailedOperation();
-          } else {
-            remove(args[0], currentUserDirectory);
-          }
-
-          break;
-
-        case "rn":
-          if (args.length !== 2) {
-            handleFailedOperation();
-          } else {
-            rename(args[0], args[1], currentUserDirectory);
-          }
-
-          break;
-
-        case "cp":
-          {
-            if (args.length !== 2) {
+      try {
+        switch (operation) {
+          case "up":
+            if (args.length) {
               handleFailedOperation();
             } else {
-              copy(args[0], args[1], currentUserDirectory, false);
+              currentUserDirectory = cd([".."], currentUserDirectory);
             }
-          }
+            break;
 
-          break;
+          case "cd":
+            currentUserDirectory = cd(args, currentUserDirectory);
+            break;
 
-        case "mv":
-          if (args.length !== 2) {
-            handleFailedOperation();
-          } else {
-            copy(args[0], args[1], currentUserDirectory, true);
-          }
+          case "ls":
+            ls(args, currentUserDirectory);
+            break;
 
-          break;
+          case "add":
+            add(args, currentUserDirectory);
+            break;
 
-        case "hash":
-          if (args.length !== 1) {
-            handleFailedOperation();
-          } else {
-            hash(args[0], currentUserDirectory);
-          }
+          case "cat":
+            read(args, currentUserDirectory);
+            break;
 
-          break;
+          case "rm":
+            remove(args, currentUserDirectory);
+            break;
 
-        case "compress":
-          if (args.length !== 2) {
-            handleFailedOperation();
-          } else {
-            compress(args[0], args[1], currentUserDirectory);
-          }
+          case "rn":
+            rename(args, currentUserDirectory);
+            break;
 
-          break;
+          case "cp":
+            copy(args, currentUserDirectory, false);
+            break;
 
-        case "decompress":
-          if (args.length !== 2) {
-            handleFailedOperation();
-          } else {
-            decompress(args[0], args[1], currentUserDirectory);
-          }
+          case "mv":
+            copy(args, currentUserDirectory, true);
+            break;
 
-        case ".exit":
-          if (args.length > 0) {
-            handleFailedOperation();
-          } else {
-            rl.close();
-          }
+          case "hash":
+            hash(args, currentUserDirectory);
+            break;
 
-          break;
+          case "compress":
+            compress(args, currentUserDirectory);
+            break;
 
-        default:
-          handleInvalidInput();
+          case "decompress":
+            decompress(args, currentUserDirectory);
+            break;
+
+          case "os":
+            os(args, currentUserDirectory);
+            break;
+
+          case ".exit":
+            if (args.length) {
+              handleFailedOperation();
+            } else {
+              rl.close();
+            }
+            break;
+
+          default:
+            handleInvalidInput();
+        }
+      } catch (e) {
+        handleFailedOperation();
       }
-    } catch (e) {
-      console.error(e);
-    }
-  });
+    });
 
-  rl.on("close", () => {
-    handleProgramExit(username);
-  });
+    rl.on("close", () => {
+      handleProgramExit(username);
+    });
+  } else {
+    process.exit(1);
+  }
 };
 
 fileManager();

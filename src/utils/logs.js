@@ -1,13 +1,12 @@
 export const greetUser = (username) =>
-  process.stdin.write(`Welcome to the File Manager, ${username}!\n`);
+  console.log(`Welcome to the File Manager, ${username}!`);
 
 export const handleProgramExit = (username) =>
-  process.stdin.write(`Thank you for using File Manager, ${username}!\n`);
+  console.log(`Thank you for using File Manager, ${username}!`);
 
-export const handleInvalidInput = () => process.stdin.write("Invalid input \n");
+export const handleInvalidInput = () => console.log("Invalid input");
 
 export const logCurrentDirectory = (currentDirectory) =>
-  process.stdin.write(`You are currently in ${currentDirectory}\n`);
+  console.log(`You are currently in ${currentDirectory}`);
 
-export const handleFailedOperation = () =>
-  process.stdin.write("Operation failed \n");
+export const handleFailedOperation = () => console.log("Operation failed");
